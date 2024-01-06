@@ -15,9 +15,11 @@
 class College {
 
 	template <typename T>
-	using ptr = std::shared_ptr<T>;
+	using ptr = const std::shared_ptr<T>&;
 	template <typename T>
 	using uset_ptr = std::unordered_set<ptr<T>>;
+	template <typename T>
+	using set_ptr = std::set<ptr<T>>;
 
 	using people_t = uset_ptr<Person>;
 	using students_t = uset_ptr<Student>;
@@ -28,7 +30,14 @@ class College {
 public:
 	bool add_course(std::string_view name, bool active = true) {return false;}
 
-    auto find_courses(std::string_view pattern) {}
+    auto find_courses(std::string_view pattern) {
+		set_ptr<Course> res;
+		for (const auto& p : courses) {
+			if (college_utils::is_match(pattern, p->get_name()))
+				res.insert(p);
+		}
+		return res;
+	}
 
     bool change_course_activeness(ptr<Course> course, bool active) {return false;}
 
@@ -37,7 +46,13 @@ public:
     bool change_student_activeness(ptr<Student> student, bool active) {return false;}
 
     template<college_utils::StudTeach T>
-    auto find(ptr<Course> course) {}
+    set_ptr<T> find(ptr<Course> course) {
+		if constexpr (std::is_same_v<T, Student>) {
+			return find_in<T>(students, course);
+		} else {
+			return find_in<T>(teachers, course);
+		}
+	}
 
     template <college_utils::StudTeach T>
     bool assign_course(ptr<T> person, ptr<Course> course) {return false;}
@@ -53,7 +68,7 @@ public:
 	}
 
 	template <college_utils::PersonBased T>
-	std::vector<ptr<T>> find(std::string_view name_pattern, std::string_view surname_pattern) const {
+	set_ptr<T> find(std::string_view name_pattern, std::string_view surname_pattern) const {
 		if constexpr (std::is_same_v<T, Student>) {
 			return find_in<T>(students, name_pattern, surname_pattern);
 		}
@@ -76,7 +91,7 @@ private:
     courses_t courses;
 
 	template <college_utils::SpecialPerson T>
-	auto create_person(std::string_view name, std::string_view surname, bool active) {
+	set_ptr<T> create_person(std::string_view name, std::string_view surname, bool active) {
 		if constexpr (std::is_same_v<T, Teacher>) {
 			return std::make_shared<T>(name, surname);
 		} else {
@@ -99,14 +114,24 @@ private:
 	}
 
 	template <college_utils::PersonBased T, typename C>
-	std::vector<ptr<T>> find_in(const C& container, std::string_view name_pattern, std::string_view surname_pattern) const {
-		std::vector<ptr<T>> res;
+	set_ptr<T> find_in(const C& container, std::string_view name_pattern, std::string_view surname_pattern) const {
+		set_ptr<T> res;
 		for (const auto& p : container) {
 			if (
 				college_utils::is_match(name_pattern, p->get_name()) &&
 				college_utils::is_match(surname_pattern, p->get_surname())
 			)
-				res.push_back(p);
+				res.insert(p);
+		}
+		return res;
+	}
+
+	template <college_utils::StudTeach T, typename C>
+	set_ptr<T> find_in(const C& container, ptr<Course> course) {
+		set_ptr<T> res;
+		for (const auto& p : container) {
+			if (p->get_courses().contains(course))
+				res.insert(p);
 		}
 		return res;
 	}
