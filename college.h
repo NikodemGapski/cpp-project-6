@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 
+#define TODO throw std::exception("Not implemented");
+
 class College {
 
 	template <typename T>
@@ -55,7 +57,17 @@ public:
 	}
 
     template <college_utils::StudTeach T>
-    bool assign_course(ptr<T> person, ptr<Course> course) {return false;}
+    bool assign_course(ptr<T> person, ptr<Course> course) {
+		check(courses, course, "Course");
+		if constexpr (std::is_same_v<T, Student>)
+			check(students, person, "Student");
+		else
+			check(teachers, person, "Teacher");
+
+		if (person->get_courses().contains(course))
+			return false;
+		TODO // add course
+	}
 
 	template <college_utils::SpecialPerson T>
 	bool add_person(std::string_view name, std::string_view surname, bool active = true) {
@@ -134,5 +146,13 @@ private:
 				res.insert(p);
 		}
 		return res;
+	}
+
+	template <typename T, typename C>
+	void check(const C& container, T element, std::string_view name) const {
+		if (!container.contains(element))
+			throw std::invalid_argument(name + " doesn't exist");
+		if (!(**container.find(element)).is_active())
+			throw std::invalid_argument(name + " is inactive");
 	}
 };
