@@ -12,16 +12,20 @@
 namespace college_utils {
 	/* Concepts */
 	template <typename T>
-	concept SpecialPerson =
+	concept StudTeach =
 		std::is_same_v<T, Student> ||
-		std::is_same_v<T, Teacher> ||
+		std::is_same_v<T, Teacher>;
+
+	template <typename T>
+	concept SpecialPerson =
+		StudTeach<T> ||
 		std::is_same_v<T, PhDStudent>;
 	
 	template <typename T>
 	concept PersonBased = std::is_base_of_v<Person, T>;
 
 	/* Regular expressions */
-	bool is_match(const std::string& pattern, const std::string& text) {
+	bool is_match(std::string_view pattern, std::string_view text) {
 		// Transform the pattern to match the ECMAScript grammar.
 		std::string ecma = "^";
 		for (char c : pattern) {
@@ -35,6 +39,6 @@ namespace college_utils {
 		}
 		ecma.push_back('$');
 		std::regex rgx(ecma);
-		return std::regex_match(text, rgx);
+		return std::regex_match(std::string{text}, rgx);
 	}
 }
