@@ -17,7 +17,7 @@
 class College {
 
 	template <typename T>
-	using ptr = const std::shared_ptr<T>&;
+	using ptr = std::shared_ptr<T>;
 	template <typename T>
 	using uset_ptr = std::unordered_set<ptr<T>>;
 	template <typename T>
@@ -63,8 +63,9 @@ public:
 			check(students, person, "Student");
 		else
 			check(teachers, person, "Teacher");
+        T* ptr = person.get();
 
-		if (person->get_courses().contains(course))
+		if (ptr->get_courses().contains(course))
 			return false;
 		TODO // add course
 	}
@@ -72,7 +73,7 @@ public:
 	template <college_utils::SpecialPerson T>
 	bool add_person(std::string_view name, std::string_view surname, bool active = true) {
 		// Check if such person exists in the database.
-		if (find<Person>(name, surname).size() > 0)
+		if (!find<Person>(name, surname).empty())
 			return false;
 		// If not, create one and add them to the database.
 		insert_person<T>(create_person<T>(name, surname, active));
@@ -103,7 +104,7 @@ private:
     courses_t courses;
 
 	template <college_utils::SpecialPerson T>
-	set_ptr<T> create_person(std::string_view name, std::string_view surname, bool active) {
+	ptr<T> create_person(std::string_view name, std::string_view surname, bool active) {
 		if constexpr (std::is_same_v<T, Teacher>) {
 			return std::make_shared<T>(name, surname);
 		} else {
@@ -151,8 +152,8 @@ private:
 	template <typename T, typename C>
 	void check(const C& container, T element, std::string_view name) const {
 		if (!container.contains(element))
-			throw std::invalid_argument(name + " doesn't exist");
+			throw std::invalid_argument(std::string(name) + " doesn't exist");
 		if (!(**container.find(element)).is_active())
-			throw std::invalid_argument(name + " is inactive");
+			throw std::invalid_argument(std::string(name) + " is inactive");
 	}
 };
