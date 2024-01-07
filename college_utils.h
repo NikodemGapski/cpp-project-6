@@ -5,6 +5,7 @@
 #include "phdstudent.h"
 
 #include <string>
+#include <string_view>
 #include <regex>
 #include <type_traits> // std::is_same_v
 
@@ -32,12 +33,15 @@ namespace college_utils {
 	/* Regular expressions */
 	bool is_match(std::string_view pattern, std::string_view text) {
 		// Transform the pattern to match the ECMAScript grammar.
+		static std::string special_chars = ".^$+()[{\\|";
 		std::string ecma = "^";
 		for (char c : pattern) {
 			if (c == '?') {
 				ecma.push_back('.');
 			} else if (c == '*') {
 				ecma.append({'.', '*'});
+			} else if (special_chars.find(c) != std::string::npos) {
+				ecma.append({'\\', c});
 			} else {
 				ecma.push_back(c);
 			}

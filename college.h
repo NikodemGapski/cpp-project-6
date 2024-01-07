@@ -14,7 +14,6 @@
 #define TODO throw std::runtime_error("Not implemented");
 
 class College {
-
 	template <typename T>
 	using ptr = std::shared_ptr<T>;
 	template <typename T>
@@ -29,8 +28,6 @@ class College {
 	using courses_t = uset_ptr<Course>;
 
 public:
-	bool add_course(std::string_view name, bool active = true) {return false;}
-
     auto find_courses(std::string_view pattern) {
 		set_ptr<Course> res;
 		for (const auto& p : courses) {
@@ -40,14 +37,28 @@ public:
 		return res;
 	}
 
+	bool add_course(std::string_view name, bool active = true) {
+		if (find_courses(name).size() > 0)
+			return false;
+		courses.insert(std::make_shared<Course>(name, active));
+		return true;
+	}
+
     bool change_course_activeness(ptr<Course> course, bool active) {
-		TODO
-		return false;
+		if (!courses.contains(course))
+			return false;
+		TODO // Change activeness of course
+		return true;
 	}
 
     bool remove_course(ptr<Course> course) {
-		TODO
-		return false;
+		if (!courses.contains(course))
+			return false;
+		TODO // Change activeness of course
+		// Since it's a shared pointer, there's no need to worry
+		// about people still having this course in their sets.
+		courses.erase(course);
+		return true;
 	}
 
     bool change_student_activeness(ptr<Student> student, bool active) {
@@ -148,7 +159,7 @@ private:
 	}
 
 	template <college_utils::StudTeach T, typename C>
-	set_ptr<T> find_in(const C& container, ptr<Course> course) {
+	set_ptr<T> find_in(const C& container, ptr<Course> course) const {
 		set_ptr<T> res;
 		for (const auto& p : container) {
 			if (p->get_courses().contains(course))
@@ -158,11 +169,11 @@ private:
 	}
 
 	template <typename T, typename C>
-	void check(const C& container, ptr<T> element, std::string_view name) const {
+	void check(const C& container, ptr<T> element, std::string_view name, bool should_be_active = true) const {
 		if (!container.contains(element))
 			throw std::invalid_argument(std::string(name) + " doesn't exist");
 		if constexpr (college_utils::HasActivity<T>) {
-			if (!(**container.find(element)).is_active())
+			if (should_be_active && !(**container.find(element)).is_active())
 				throw std::invalid_argument(std::string(name) + " is inactive");
 		}
 	}
