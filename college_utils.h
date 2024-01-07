@@ -50,4 +50,13 @@ namespace college_utils {
 		std::regex rgx(ecma);
 		return std::regex_match(std::string{text}, rgx);
 	}
+
+	/* Shared pointer comparator */
+	struct SharedComp {
+		template <typename T>
+		bool operator()(const std::shared_ptr<T>& a,
+						const std::shared_ptr<T>& b) const {
+			return (*a) < (*b);
+		}
+	};
 }

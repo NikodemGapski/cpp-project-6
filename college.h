@@ -19,7 +19,7 @@ class College {
 	template <typename T>
 	using uset_ptr = std::unordered_set<ptr<T>>;
 	template <typename T>
-	using set_ptr = std::set<ptr<T>>;
+	using set_ptr = std::set<ptr<T>, college_utils::SharedComp>;
 
 	using people_t = uset_ptr<Person>;
 	using students_t = uset_ptr<Student>;
