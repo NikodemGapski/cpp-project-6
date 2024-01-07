@@ -7,12 +7,11 @@
 #include "college_utils.h"
 
 #include <type_traits> // std::is_same_v
-#include <unordered_set>
-#include <set>
-#include <vector>
-#include <string>
+#include <unordered_set> // data indexing
+#include <set> // find results
+#include <string_view> // std::string_view
 
-#define TODO throw std::exception("Not implemented");
+#define TODO throw std::runtime_error("Not implemented");
 
 class College {
 
@@ -41,11 +40,20 @@ public:
 		return res;
 	}
 
-    bool change_course_activeness(ptr<Course> course, bool active) {return false;}
+    bool change_course_activeness(ptr<Course> course, bool active) {
+		TODO
+		return false;
+	}
 
-    bool remove_course(ptr<Course> course) {return false;}
+    bool remove_course(ptr<Course> course) {
+		TODO
+		return false;
+	}
 
-    bool change_student_activeness(ptr<Student> student, bool active) {return false;}
+    bool change_student_activeness(ptr<Student> student, bool active) {
+		TODO
+		return false;
+	}
 
     template<college_utils::StudTeach T>
     set_ptr<T> find(ptr<Course> course) {
@@ -150,10 +158,12 @@ private:
 	}
 
 	template <typename T, typename C>
-	void check(const C& container, T element, std::string_view name) const {
+	void check(const C& container, ptr<T> element, std::string_view name) const {
 		if (!container.contains(element))
 			throw std::invalid_argument(std::string(name) + " doesn't exist");
-		if (!(**container.find(element)).is_active())
-			throw std::invalid_argument(std::string(name) + " is inactive");
+		if constexpr (college_utils::HasActivity<T>) {
+			if (!(**container.find(element)).is_active())
+				throw std::invalid_argument(std::string(name) + " is inactive");
+		}
 	}
 };

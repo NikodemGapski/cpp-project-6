@@ -24,6 +24,11 @@ namespace college_utils {
 	template <typename T>
 	concept PersonBased = std::is_base_of_v<Person, T>;
 
+	template <typename T>
+	concept HasActivity = requires(T a) {
+		{a.is_active()} -> std::same_as<bool>;
+	};
+
 	/* Regular expressions */
 	bool is_match(std::string_view pattern, std::string_view text) {
 		// Transform the pattern to match the ECMAScript grammar.
