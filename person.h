@@ -3,8 +3,8 @@
 
 
 class Person {
-    std::string name;
     std::string surname;
+    std::string name;
 
 public:
 
@@ -17,5 +17,7 @@ public:
     std::string_view get_surname() const;
 
     bool operator== (const Person& other) const;
+
+    std::strong_ordering operator<=> (const Person& other) const;
 
 };

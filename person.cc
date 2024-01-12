@@ -20,3 +20,5 @@ std::string_view Person::get_surname() const {
 }
 
 bool Person::operator== (const Person& other) const = default;
+
+std::strong_ordering Person::operator<=>(const Person& other) const = default;

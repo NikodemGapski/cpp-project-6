@@ -1,8 +1,5 @@
 #pragma once
-#include "person.h"
-#include "student.h"
-#include "teacher.h"
-#include "phdstudent.h"
+#include "forward_declarations.h"
 
 #include <string>
 #include <string_view>
@@ -31,7 +28,7 @@ namespace college_utils {
 	};
 
 	/* Regular expressions */
-	bool is_match(std::string_view pattern, std::string_view text) {
+	inline bool is_match(std::string_view pattern, std::string_view text) {
 		// Transform the pattern to match the ECMAScript grammar.
 		static std::string special_chars = ".^$+()[{\\|";
 		std::string ecma = "^";

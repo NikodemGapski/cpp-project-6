@@ -38,7 +38,7 @@ public:
 	}
 
 	bool add_course(std::string_view name, bool active = true) {
-		if (find_courses(name).size() > 0)
+		if (!find_courses(name).empty())
 			return false;
 		courses.insert(std::make_shared<Course>(name, active));
 		return true;
@@ -47,23 +47,24 @@ public:
     bool change_course_activeness(ptr<Course> course, bool active) {
 		if (!courses.contains(course))
 			return false;
-		TODO // Change activeness of course
+		course->active = active;
 		return true;
 	}
 
     bool remove_course(ptr<Course> course) {
 		if (!courses.contains(course))
 			return false;
-		TODO // Change activeness of course
-		// Since it's a shared pointer, there's no need to worry
-		// about people still having this course in their sets.
+		course->active = false;
 		courses.erase(course);
 		return true;
 	}
 
     bool change_student_activeness(ptr<Student> student, bool active) {
-		TODO
-		return false;
+        if (!students.contains(student)) {
+            return false;
+        }
+		student->active = active;
+        return true;
 	}
 
     template<college_utils::StudTeach T>
@@ -86,7 +87,8 @@ public:
 
 		if (ptr->get_courses().contains(course))
 			return false;
-		TODO // add course
+		person->courses.insert(course);
+        return true;
 	}
 
 	template <college_utils::SpecialPerson T>
