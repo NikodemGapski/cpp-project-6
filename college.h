@@ -19,13 +19,13 @@ class College {
 	template <typename T>
 	using uset_ptr = std::unordered_set<ptr<T>>;
 	template <typename T>
-	using set_ptr = std::set<ptr<T>, college_utils::SharedComp>;
+	using set_ptr = college_utils::set_ptr<T>;
 
 	using people_t = uset_ptr<Person>;
 	using courses_t = uset_ptr<Course>;
 
 public:
-    auto find_courses(std::string_view pattern) const {
+    const set_ptr<Course> find_courses(std::string_view pattern) const {
 		set_ptr<Course> res;
 		for (const auto& p : courses) {
 			if (college_utils::is_match(pattern, p->get_name()))
@@ -64,7 +64,7 @@ public:
 	}
 
     template<college_utils::StudTeach T>
-    set_ptr<T> find(ptr<Course> course) const {
+    const set_ptr<T> find(ptr<Course> course) const {
 		set_ptr<T> res;
 		for (const auto& p : people) {
 			auto casted = cast<T>(p);
@@ -96,7 +96,7 @@ public:
 	}
 
 	template <college_utils::PersonBased T>
-	set_ptr<T> find(std::string_view name_pattern, std::string_view surname_pattern) const {
+	const set_ptr<T> find(std::string_view name_pattern, std::string_view surname_pattern) const {
 		set_ptr<T> res;
 		for (const auto& p : people) {
 			if (cast<T>(p) &&
@@ -138,7 +138,7 @@ private:
 	}
 
 	template <typename T, typename Arg>
-	auto cast(ptr<Arg> arg) const {
+	ptr<T> cast(ptr<Arg> arg) const {
 		return std::dynamic_pointer_cast<T>(arg);
 	}
 };

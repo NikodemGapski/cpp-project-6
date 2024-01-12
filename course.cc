@@ -12,4 +12,6 @@ bool Course::is_active() const {
     return active;
 }
 
-std::strong_ordering Course::operator<=>(const Course& other) const = default;
+std::strong_ordering Course::operator<=>(const Course& other) const {
+    return name <=> other.name;
+}

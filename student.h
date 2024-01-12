@@ -11,7 +11,7 @@ class College;
 
 class Student : public virtual Person {
     bool active;
-    std::set<std::shared_ptr<Course>, college_utils::SharedComp> courses;
+    college_utils::set_ptr<Course> courses;
 
     friend class College;
 
@@ -20,5 +20,5 @@ public:
 
     bool is_active() const;
 
-    const std::set<std::shared_ptr<Course>, college_utils::SharedComp>& get_courses() const;
+    const college_utils::set_ptr<Course>& get_courses() const;
 };

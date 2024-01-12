@@ -5,6 +5,7 @@
 #include <string_view>
 #include <regex>
 #include <type_traits> // std::is_same_v
+#include <set>
 
 /* A set of general-purpose utility functions. */
 namespace college_utils {
@@ -56,4 +57,6 @@ namespace college_utils {
 			return (*a) < (*b);
 		}
 	};
+	template <typename T>
+	using set_ptr = std::set<std::shared_ptr<T>, SharedComp>;
 }

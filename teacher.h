@@ -9,12 +9,12 @@
 class College;
 
 class Teacher: public virtual Person{
-    std::set<std::shared_ptr<Course>, college_utils::SharedComp> courses;
+    college_utils::set_ptr<Course> courses;
 
     friend class College;
 
 public:
     Teacher(std::string_view name, std::string_view surname);
 
-    const std::set<std::shared_ptr<Course>, college_utils::SharedComp>& get_courses() const;
+    const college_utils::set_ptr<Course>& get_courses() const;
 };
