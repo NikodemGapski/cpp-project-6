@@ -22,13 +22,10 @@ class College {
 	using set_ptr = std::set<ptr<T>, college_utils::SharedComp>;
 
 	using people_t = uset_ptr<Person>;
-	using students_t = uset_ptr<Student>;
-	using teachers_t = uset_ptr<Teacher>;
-	using phd_students_t = uset_ptr<PhDStudent>;
 	using courses_t = uset_ptr<Course>;
 
 public:
-    auto find_courses(std::string_view pattern) {
+    auto find_courses(std::string_view pattern) const {
 		set_ptr<Course> res;
 		for (const auto& p : courses) {
 			if (college_utils::is_match(pattern, p->get_name()))
@@ -60,32 +57,29 @@ public:
 	}
 
     bool change_student_activeness(ptr<Student> student, bool active) {
-        if (!students.contains(student)) {
+        if (!people.contains(student))
             return false;
-        }
 		student->active = active;
         return true;
 	}
 
     template<college_utils::StudTeach T>
-    set_ptr<T> find(ptr<Course> course) {
-		if constexpr (std::is_same_v<T, Student>) {
-			return find_in<T>(students, course);
-		} else {
-			return find_in<T>(teachers, course);
+    set_ptr<T> find(ptr<Course> course) const {
+		set_ptr<T> res;
+		for (const auto& p : people) {
+			auto casted = cast<T>(p);
+			if (casted && casted->get_courses().contains(course))
+				res.insert(casted);
 		}
+		return res;
 	}
 
     template <college_utils::StudTeach T>
     bool assign_course(ptr<T> person, ptr<Course> course) {
-		check(courses, course, "Course");
-		if constexpr (std::is_same_v<T, Student>)
-			check(students, person, "Student");
-		else
-			check(teachers, person, "Teacher");
-        T* ptr = person.get();
+		check(course);
+		check(person);
 
-		if (ptr->get_courses().contains(course))
+		if (person->get_courses().contains(course))
 			return false;
 		person->courses.insert(course);
         return true;
@@ -97,35 +91,28 @@ public:
 		if (!find<Person>(name, surname).empty())
 			return false;
 		// If not, create one and add them to the database.
-		insert_person<T>(create_person<T>(name, surname, active));
+		people.insert(create_person<T>(name, surname, active));
 		return true;
 	}
 
 	template <college_utils::PersonBased T>
 	set_ptr<T> find(std::string_view name_pattern, std::string_view surname_pattern) const {
-		if constexpr (std::is_same_v<T, Student>) {
-			return find_in<T>(students, name_pattern, surname_pattern);
+		set_ptr<T> res;
+		for (const auto& p : people) {
+			if (cast<T>(p) &&
+				college_utils::is_match(name_pattern, p->get_name()) &&
+				college_utils::is_match(surname_pattern, p->get_surname()))
+				res.insert(cast<T>(p));
 		}
-		if constexpr (std::is_same_v<T, Teacher>) {
-			return find_in<T>(teachers, name_pattern, surname_pattern);
-		}
-		if constexpr (std::is_same_v<T, PhDStudent>) {
-			return find_in<T>(phd_students, name_pattern, surname_pattern);
-		}
-		if constexpr (std::is_same_v<T, Person>) {
-			return find_in<T>(people, name_pattern, surname_pattern);
-		}
+		return res;
 	}
 
 private:
 	people_t people;
-	students_t students;
-	teachers_t teachers;
-	phd_students_t phd_students;
     courses_t courses;
 
 	template <college_utils::SpecialPerson T>
-	ptr<T> create_person(std::string_view name, std::string_view surname, bool active) {
+	ptr<T> create_person(std::string_view name, std::string_view surname, bool active) const {
 		if constexpr (std::is_same_v<T, Teacher>) {
 			return std::make_shared<T>(name, surname);
 		} else {
@@ -133,50 +120,25 @@ private:
 		}
 	}
 
-	template <college_utils::SpecialPerson T>
-	void insert_person(ptr<T> person) {
-		people.insert(person);
-		if constexpr (std::is_base_of_v<Student, T>) {
-			students.insert(person);
-		}
-		if constexpr (std::is_base_of_v<Teacher, T>) {
-			teachers.insert(person);
-		}
-		if constexpr (std::is_same_v<T, PhDStudent>) {
-			phd_students.insert(person);
+	void check(ptr<Course> course) const {
+		if (!courses.contains(course))
+			throw std::invalid_argument("Non-existing course.");
+		if (!course->is_active())
+			throw std::invalid_argument("Incorrect operation on an inactive course.");
+	}
+
+	template <college_utils::StudTeach T>
+	void check(ptr<T> person) const {
+		if (!people.contains(person))
+			throw std::invalid_argument("Non-existing person.");
+		if constexpr (std::same_as<T, Student>) {
+			if (!person->is_active())
+				throw std::invalid_argument("Incorrect operation for an inactive student.");
 		}
 	}
 
-	template <college_utils::PersonBased T, typename C>
-	set_ptr<T> find_in(const C& container, std::string_view name_pattern, std::string_view surname_pattern) const {
-		set_ptr<T> res;
-		for (const auto& p : container) {
-			if (
-				college_utils::is_match(name_pattern, p->get_name()) &&
-				college_utils::is_match(surname_pattern, p->get_surname())
-			)
-				res.insert(p);
-		}
-		return res;
-	}
-
-	template <college_utils::StudTeach T, typename C>
-	set_ptr<T> find_in(const C& container, ptr<Course> course) const {
-		set_ptr<T> res;
-		for (const auto& p : container) {
-			if (p->get_courses().contains(course))
-				res.insert(p);
-		}
-		return res;
-	}
-
-	template <typename T, typename C>
-	void check(const C& container, ptr<T> element, std::string_view name, bool should_be_active = true) const {
-		if (!container.contains(element))
-			throw std::invalid_argument(std::string(name) + " doesn't exist");
-		if constexpr (college_utils::HasActivity<T>) {
-			if (should_be_active && !(**container.find(element)).is_active())
-				throw std::invalid_argument(std::string(name) + " is inactive");
-		}
+	template <typename T, typename Arg>
+	auto cast(ptr<Arg> arg) const {
+		return std::dynamic_pointer_cast<T>(arg);
 	}
 };

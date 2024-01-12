@@ -3,8 +3,8 @@
 
 
 class Person {
-    std::string surname;
     std::string name;
+    std::string surname;
 
 public:
 

@@ -2,8 +2,8 @@
 
 
 Student::Student(std::string_view name, std::string_view surname, bool active) :
-    active(active),
-    Person(name, surname) {}
+    Person(name, surname),
+    active(active) {}
 
 bool Student::is_active() const {
     return active;

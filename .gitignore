@@ -4,3 +4,4 @@ Makefile
 sand*
 CMakeLists.txt
 .vscode
+example
