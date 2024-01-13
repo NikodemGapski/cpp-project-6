@@ -1,9 +1,4 @@
-
-
 #include "person.h"
-#include <string_view>
-
-
 
 Person::Person(std::string_view name, std::string_view surname) :
     name(name),

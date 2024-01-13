@@ -1,4 +1,5 @@
 #pragma once
+
 #include "person.h"
 #include "student.h"
 #include "teacher.h"
@@ -6,12 +7,11 @@
 #include "course.h"
 #include "college_utils.h"
 
-#include <type_traits> // std::is_same_v
-#include <unordered_set> // data indexing
-#include <set> // find results
-#include <string_view> // std::string_view
-
-#define TODO throw std::runtime_error("Not implemented");
+#include <concepts> 		// std::same_as
+#include <unordered_set> 	// data indexing
+#include <set> 				// find results
+#include <string_view> 		// std::string_view
+#include <memory>			// std::shared_ptr
 
 class College {
 	template <typename T>
@@ -66,6 +66,11 @@ public:
     template<college_utils::StudTeach T>
     const set_ptr<T> find(ptr<Course> course) const {
 		set_ptr<T> res;
+		// This if statement prevents from looking for a course that looks the same,
+		// but is a different one (get_courses() is a std::set with a comparator
+		// based on the pointed objects).
+		if (!courses.contains(course))
+			return res;
 		for (const auto& p : people) {
 			auto casted = cast<T>(p);
 			if (casted && casted->get_courses().contains(course))
@@ -108,18 +113,22 @@ public:
 	}
 
 private:
+	/* A collection of all the people in the college. */
 	people_t people;
+	/* A collection of all the courses in the college. */
     courses_t courses;
 
+	/* A wrapper call to std::make_shared on the appropriate type with or without active flag. */
 	template <college_utils::SpecialPerson T>
 	ptr<T> create_person(std::string_view name, std::string_view surname, bool active) const {
-		if constexpr (std::is_same_v<T, Teacher>) {
-			return std::make_shared<T>(name, surname);
-		} else {
+		if constexpr (college_utils::HasActivityConstructor<T>) {
 			return std::make_shared<T>(name, surname, active);
+		} else {
+			return std::make_shared<T>(name, surname);
 		}
 	}
 
+	/* Check if the course is valid. */
 	void check(const ptr<Course>& course) const {
 		if (!courses.contains(course))
 			throw std::invalid_argument("Non-existing course.");
@@ -127,6 +136,7 @@ private:
 			throw std::invalid_argument("Incorrect operation on an inactive course.");
 	}
 
+	/* Check if the student/teacher is valid. */
 	template <college_utils::StudTeach T>
 	void check(ptr<T> person) const {
 		if (!people.contains(person))
@@ -138,7 +148,7 @@ private:
 	}
 
 	template <typename T, typename Arg>
-	ptr<T> cast(ptr<Arg> arg) const {
+	ptr<T> cast(ptr<Arg> arg) const noexcept {
 		return std::dynamic_pointer_cast<T>(arg);
 	}
 };

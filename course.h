@@ -1,11 +1,11 @@
 #pragma once
+
 #include <string>
 #include <string_view>
 
 class College;
 
 class Course {
-
     std::string name;
     bool active;
 
