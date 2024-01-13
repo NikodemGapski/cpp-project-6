@@ -18,7 +18,7 @@ class Student : public virtual Person {
 public:
     Student(std::string_view name, std::string_view surname, bool active = true);
 
-    bool is_active() const;
+    bool is_active() const noexcept;
 
-    const college_utils::set_ptr<Course>& get_courses() const;
+    const college_utils::set_ptr<Course>& get_courses() const noexcept;
 };

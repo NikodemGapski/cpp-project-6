@@ -11,17 +11,17 @@ Person::Person(std::string_view name, std::string_view surname) :
 
 Person::~Person() = default;
 
-std::string_view Person::get_name() const {
+std::string_view Person::get_name() const noexcept {
     return name;
 }
 
-std::string_view Person::get_surname() const {
+std::string_view Person::get_surname() const noexcept {
     return surname;
 }
 
-bool Person::operator== (const Person& other) const = default;
+bool Person::operator== (const Person& other) const noexcept = default;
 
-std::strong_ordering Person::operator<=>(const Person& other) const {
+std::strong_ordering Person::operator<=>(const Person& other) const noexcept {
     if (auto cmp = surname <=> other.surname; cmp != 0)
         return cmp;
     return name <=> other.name;

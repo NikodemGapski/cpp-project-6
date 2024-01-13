@@ -15,9 +15,9 @@ public:
 
     Course(std::string_view name, bool active = true);
 
-    std::string_view get_name() const;
+    std::string_view get_name() const noexcept;
 
-    bool is_active() const;
+    bool is_active() const noexcept;
 
-    std::strong_ordering operator<=> (const Course& other) const;
+    std::strong_ordering operator<=> (const Course& other) const noexcept;
 };

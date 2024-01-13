@@ -16,5 +16,5 @@ class Teacher: public virtual Person{
 public:
     Teacher(std::string_view name, std::string_view surname);
 
-    const college_utils::set_ptr<Course>& get_courses() const;
+    const college_utils::set_ptr<Course>& get_courses() const noexcept;
 };

@@ -41,14 +41,14 @@ public:
 		return true;
 	}
 
-    bool change_course_activeness(ptr<Course> course, bool active) {
+    bool change_course_activeness(const ptr<Course>& course, bool active) noexcept {
 		if (!courses.contains(course))
 			return false;
 		course->active = active;
 		return true;
 	}
 
-    bool remove_course(ptr<Course> course) {
+    bool remove_course(const ptr<Course>& course) noexcept {
 		if (!courses.contains(course))
 			return false;
 		course->active = false;
@@ -56,7 +56,7 @@ public:
 		return true;
 	}
 
-    bool change_student_activeness(ptr<Student> student, bool active) {
+    bool change_student_activeness(const ptr<Student>& student, bool active) noexcept {
         if (!people.contains(student))
             return false;
 		student->active = active;
@@ -120,7 +120,7 @@ private:
 		}
 	}
 
-	void check(ptr<Course> course) const {
+	void check(const ptr<Course>& course) const {
 		if (!courses.contains(course))
 			throw std::invalid_argument("Non-existing course.");
 		if (!course->is_active())

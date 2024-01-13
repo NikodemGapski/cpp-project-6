@@ -5,10 +5,10 @@ Student::Student(std::string_view name, std::string_view surname, bool active) :
     Person(name, surname),
     active(active) {}
 
-bool Student::is_active() const {
+bool Student::is_active() const noexcept {
     return active;
 }
 
-const college_utils::set_ptr<Course>& Student::get_courses() const {
+const college_utils::set_ptr<Course>& Student::get_courses() const noexcept {
     return courses;
 }

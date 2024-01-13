@@ -12,12 +12,12 @@ public:
 
     virtual ~Person();
 
-    std::string_view get_name() const;
+    std::string_view get_name() const noexcept;
 
-    std::string_view get_surname() const;
+    std::string_view get_surname() const noexcept;
 
-    bool operator== (const Person& other) const;
+    bool operator== (const Person& other) const noexcept;
 
-    std::strong_ordering operator<=> (const Person& other) const;
+    std::strong_ordering operator<=> (const Person& other) const noexcept;
 
 };
