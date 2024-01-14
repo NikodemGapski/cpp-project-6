@@ -8,6 +8,9 @@ class Person {
 
 public:
 
+    Person() = delete;
+    Person(const Person&) = delete;
+
     Person(std::string_view name, std::string_view surname);
 
     virtual ~Person();

@@ -13,6 +13,9 @@ class Course {
 
 public:
 
+    Course() = delete;
+    Course(const Course&) = delete;
+
     Course(std::string_view name, bool active = true);
 
     std::string_view get_name() const noexcept;

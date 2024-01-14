@@ -25,6 +25,8 @@ class College {
 	using courses_t = uset_ptr<Course>;
 
 public:
+    College(const College&) = delete;
+
     const set_ptr<Course> find_courses(std::string_view pattern) const {
 		set_ptr<Course> res;
 		for (const auto& p : courses) {

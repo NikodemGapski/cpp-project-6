@@ -16,6 +16,9 @@ class Student : public virtual Person {
     friend class College;
 
 public:
+    Student() = delete;
+    Student(const Student&) = delete;
+
     Student(std::string_view name, std::string_view surname, bool active = true);
 
     bool is_active() const noexcept;

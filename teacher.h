@@ -14,6 +14,10 @@ class Teacher: public virtual Person{
     friend class College;
 
 public:
+
+    Teacher() = delete;
+    Teacher(const Teacher&) = delete;
+
     Teacher(std::string_view name, std::string_view surname);
 
     const college_utils::set_ptr<Course>& get_courses() const noexcept;
